@@ -173,20 +173,29 @@
   const teasers=['Are you sure? 🥺','Try again…','Nope, too slow! 😏','This button refuses to be clicked 😅','Maybe a yes after all? 💕'];
   let tries=0;
   function flee(){
-    const pad=20;
-    const maxX=window.innerWidth - noBtn.offsetWidth - pad;
-    const maxY=window.innerHeight - noBtn.offsetHeight - pad;
-    const x=Math.max(pad,Math.random()*maxX);
-    const y=Math.max(pad,Math.random()*maxY);
+    const pad=16;
+    const w=noBtn.offsetWidth||90;
+    const h=noBtn.offsetHeight||50;
+    // sichtbarer Bereich, mit etwas Abstand oben (für Statusleiste) und unten
+    const minX=pad, maxX=window.innerWidth - w - pad;
+    const minY=80,  maxY=window.innerHeight - h - pad;
+    let x=minX + Math.random()*(maxX-minX);
+    let y=minY + Math.random()*(maxY-minY);
+    // sicherheitshalber clampen, damit er NIE aus dem Bild springt
+    x=Math.min(Math.max(x,minX),Math.max(minX,maxX));
+    y=Math.min(Math.max(y,minY),Math.max(minY,maxY));
     noBtn.style.position='fixed';
+    noBtn.style.margin='0';
     noBtn.style.left=x+'px';
     noBtn.style.top=y+'px';
+    noBtn.style.zIndex='9999';
     noHint.textContent=teasers[tries % teasers.length];
     tries++;
   }
-  noBtn.addEventListener('mouseenter',flee);
+  noBtn.addEventListener('mouseover',flee);
+  noBtn.addEventListener('mousedown',e=>{e.preventDefault();flee();});
   noBtn.addEventListener('click',e=>{e.preventDefault();flee();});
-  noBtn.addEventListener('touchstart',e=>{e.preventDefault();flee();},{passive:false});
+  noBtn.addEventListener('touchstart',e=>{e.preventDefault();e.stopPropagation();flee();},{passive:false});
 
   const form=document.getElementById('dateForm');
   form.addEventListener('submit',async e=>{

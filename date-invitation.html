@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A question for you…</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#1a0d14;
+    --rose:#ff5d8f;
+    --rose-soft:#ffb3c9;
+    --cream:#fff4ef;
+    --gold:#f4c95d;
+    --plum:#3d1b2e;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{min-height:100%}
+  body{
+    font-family:'Fraunces',serif;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(255,93,143,.25), transparent 45%),
+      radial-gradient(circle at 80% 70%, rgba(244,201,93,.18), transparent 45%),
+      var(--bg);
+    color:var(--cream);
+    overflow-x:hidden;
+    position:relative;
+  }
+  .heart{position:fixed;bottom:-40px;font-size:24px;color:var(--rose-soft);opacity:.35;animation:float 14s linear infinite;pointer-events:none;z-index:0}
+  @keyframes float{to{transform:translateY(-110vh) rotate(360deg);opacity:0}}
+
+  .stage{
+    position:relative;z-index:2;
+    min-height:100vh;
+    display:flex;align-items:center;justify-content:center;
+    padding:32px;
+  }
+  .card{
+    width:100%;max-width:640px;
+    background:rgba(61,27,46,.55);
+    backdrop-filter:blur(14px);
+    border:1px solid rgba(255,179,201,.25);
+    border-radius:28px;
+    padding:48px 40px;
+    box-shadow:0 30px 80px rgba(0,0,0,.45);
+    animation:rise .9s cubic-bezier(.2,.8,.2,1) both;
+  }
+  @keyframes rise{from{opacity:0;transform:translateY(40px) scale(.97)}to{opacity:1;transform:none}}
+
+  .eyebrow{font-family:'Caveat',cursive;font-size:1.7rem;color:var(--gold);text-align:center;margin-bottom:6px}
+  h1{font-size:clamp(2rem,6vw,3.2rem);font-weight:900;line-height:1.05;text-align:center;margin-bottom:28px;letter-spacing:-.5px}
+  h1 .accent{color:var(--rose);font-style:italic}
+
+  .btn-row{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+  button{font-family:'Fraunces',serif;cursor:pointer;border:none;font-size:1.15rem;font-weight:600;border-radius:999px;padding:16px 38px;transition:transform .15s,box-shadow .25s}
+  .yes{background:linear-gradient(135deg,var(--rose),#ff8fae);color:#3d1020;box-shadow:0 12px 30px rgba(255,93,143,.45)}
+  .yes:hover{transform:translateY(-3px) scale(1.04);box-shadow:0 18px 40px rgba(255,93,143,.6)}
+  .no{background:transparent;color:var(--cream);border:1.5px solid rgba(255,179,201,.5);position:relative}
+
+  .step{display:none;animation:rise .6s both}
+  .step.active{display:block}
+
+  label{display:block;font-family:'Caveat',cursive;font-size:1.5rem;color:var(--gold);margin:22px 0 8px}
+  .options{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .opt{position:relative}
+  .opt input{position:absolute;opacity:0;inset:0;cursor:pointer}
+  .opt span{
+    display:block;padding:16px;text-align:center;border-radius:16px;
+    border:1.5px solid rgba(255,179,201,.3);background:rgba(255,244,239,.05);
+    transition:.2s;font-size:1rem;
+  }
+  .opt input:checked + span{background:var(--rose);color:#3d1020;border-color:var(--rose);transform:scale(1.03)}
+  .opt span small{display:block;font-family:'Caveat',cursive;font-size:1.1rem;opacity:.8}
+
+  input[type=date],input[type=email],textarea{
+    width:100%;font-family:'Fraunces',serif;font-size:1.05rem;
+    padding:14px 18px;border-radius:14px;border:1.5px solid rgba(255,179,201,.3);
+    background:rgba(255,244,239,.06);color:var(--cream);
+  }
+  input[type=date]{color-scheme:dark}
+  textarea{resize:vertical;min-height:90px}
+  ::placeholder{color:rgba(255,244,239,.4)}
+
+  .submit{margin-top:28px;width:100%;background:linear-gradient(135deg,var(--rose),var(--gold));color:#3d1020}
+  .submit:hover{transform:translateY(-2px)}
+
+  .hint{text-align:center;font-family:'Caveat',cursive;font-size:1.2rem;color:var(--rose-soft);margin-top:16px;min-height:1.4em}
+
+  .done{text-align:center}
+  .done .big{font-size:4rem}
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="card">
+
+    <!-- Step 1: The question -->
+    <div class="step active" id="step1">
+      <p class="eyebrow">a little question…</p>
+      <h1>Would you go on a <span class="accent">date</span> with me?</h1>
+      <div class="btn-row">
+        <button class="yes" onclick="goStep(2)">Yes, I'd love to! 💕</button>
+        <button class="no" id="noBtn">No</button>
+      </div>
+      <p class="hint" id="noHint"></p>
+    </div>
+
+    <!-- Step 2: Details -->
+    <div class="step" id="step2">
+      <p class="eyebrow">yay! Let's plan it 🥳</p>
+      <h1>What should <span class="accent">we</span> do?</h1>
+
+      <form id="dateForm" action="https://formspree.io/f/xnjyqoqp" method="POST">
+        <label>Pick an idea:</label>
+        <div class="options">
+          <label class="opt"><input type="radio" name="activity" value="Dinner" required><span>Dinner 🍝<small>cozy & tasty</small></span></label>
+          <label class="opt"><input type="radio" name="activity" value="Movie"><span>Movie 🎬<small>film & popcorn</small></span></label>
+          <label class="opt"><input type="radio" name="activity" value="Walk"><span>A walk 🌿<small>talk & stroll</small></span></label>
+          <label class="opt"><input type="radio" name="activity" value="Cafe"><span>Café ☕<small>cake & coffee</small></span></label>
+          <label class="opt"><input type="radio" name="activity" value="Cocktail bar"><span>Cocktail bar 🍸<small>dress up & go out</small></span></label>
+          <label class="opt"><input type="radio" name="activity" value="Surprise me"><span>Surprise me ✨<small>you plan it</small></span></label>
+        </div>
+
+        <label>Which day works for you?</label>
+        <input type="date" name="date" required>
+
+        <label>A message for me (optional):</label>
+        <textarea name="message" placeholder="Write me something sweet…"></textarea>
+
+        <label>Your email, number or WeChat (so I can reply):</label>
+        <input type="text" name="contact" placeholder="email, phone or WeChat ID" required>
+
+        <button type="submit" class="submit">Send it 💌</button>
+      </form>
+    </div>
+
+    <!-- Step 3: Thank you -->
+    <div class="step" id="step3">
+      <div class="done">
+        <div class="big">💖</div>
+        <h1>I'm <span class="accent">so</span> happy!</h1>
+        <p class="hint">Your answer is on its way to me. See you soon! ✨</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const hearts=['💗','💕','💖','🌸','✨'];
+  for(let i=0;i<14;i++){
+    const h=document.createElement('div');
+    h.className='heart';
+    h.textContent=hearts[Math.floor(Math.random()*hearts.length)];
+    h.style.left=Math.random()*100+'vw';
+    h.style.fontSize=(16+Math.random()*26)+'px';
+    h.style.animationDuration=(10+Math.random()*12)+'s';
+    h.style.animationDelay=(-Math.random()*14)+'s';
+    document.body.appendChild(h);
+  }
+
+  function goStep(n){
+    document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+    document.getElementById('step'+n).classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  const noBtn=document.getElementById('noBtn');
+  const noHint=document.getElementById('noHint');
+  const teasers=['Are you sure? 🥺','Try again…','Nope, too slow! 😏','This button refuses to be clicked 😅','Maybe a yes after all? 💕'];
+  let tries=0;
+  function flee(){
+    const pad=20;
+    const maxX=window.innerWidth - noBtn.offsetWidth - pad;
+    const maxY=window.innerHeight - noBtn.offsetHeight - pad;
+    const x=Math.max(pad,Math.random()*maxX);
+    const y=Math.max(pad,Math.random()*maxY);
+    noBtn.style.position='fixed';
+    noBtn.style.left=x+'px';
+    noBtn.style.top=y+'px';
+    noHint.textContent=teasers[tries % teasers.length];
+    tries++;
+  }
+  noBtn.addEventListener('mouseenter',flee);
+  noBtn.addEventListener('click',e=>{e.preventDefault();flee();});
+  noBtn.addEventListener('touchstart',e=>{e.preventDefault();flee();},{passive:false});
+
+  const form=document.getElementById('dateForm');
+  form.addEventListener('submit',async e=>{
+    e.preventDefault();
+    try{
+      const res=await fetch(form.action,{method:'POST',body:new FormData(form),headers:{'Accept':'application/json'}});
+      if(res.ok){goStep(3);} else {alert('Oops, something went wrong. Did you set your Formspree ID?');}
+    }catch(err){alert('Sending failed – please check your connection & Formspree ID.');}
+  });
+</script>
+</body>
+</html>
